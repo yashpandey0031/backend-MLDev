@@ -1,0 +1,2 @@
+get started with backend development by learning the concepts first and doing some quality dsa :) 
+there is a list of stuff that i need to work with , for exmaple a good project , one summary every week and dsa 
