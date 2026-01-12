@@ -1,2 +1,4 @@
 get started with backend development by learning the concepts first and doing some quality dsa :) 
 there is a list of stuff that i need to work with , for exmaple a good project , one summary every week and dsa 
+
+for learning backend , i have decided to go with typescript and nodejs :) , seems like a fine enough choice but then again i use python for aiml and c++ for dsa so three freaking langauges lol 
