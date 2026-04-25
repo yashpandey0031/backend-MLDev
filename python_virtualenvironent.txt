@@ -1,0 +1,7 @@
+1) to create virtual envionment -> python -m venv venv 
+
+2) To actiavte the virtual envionment -> venv\Scripts\activate
+
+3) To deactivate the virtual envionment -> deactivate
+
+4) to check version -> python --version
