@@ -16,3 +16,12 @@ def read_weather(city: str ):
 
 
   return{f"weather in {city}": cleaned_data}
+
+# output ->
+# {
+#   "weather in russia": {
+#     "temperature": 5.96,
+#     "description": "overcast clouds",
+#     "wind_speed": 4.56
+#   }
+# }
