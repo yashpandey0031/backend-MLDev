@@ -14,7 +14,6 @@ def read_weather(city: str ):
     "wind_speed": data["wind"]["speed"]
   }
 
-
   return{f"weather in {city}": cleaned_data}
 
 # output ->
