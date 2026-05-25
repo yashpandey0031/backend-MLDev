@@ -1,2 +1,4 @@
+
+git add .
 git commit -m "your message"
-git push origin main    
+git push origin master(your branch name) 
