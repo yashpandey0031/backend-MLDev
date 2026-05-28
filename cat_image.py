@@ -8,5 +8,5 @@ def get_cat_image():
   data = cat_image.json()
   # only_image = {"Cat_image" : data[0]["url"]}
   # return {"URL" : only_image}
-  return {"cat_image":data[0]["url"]} #we are using data[0] as the first element of the list 
+  return {"cat_image":data[1]["url"]} #we are using data[0] as the first element of the list 
 
