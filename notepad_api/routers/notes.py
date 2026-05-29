@@ -22,4 +22,12 @@ def create_note(title: str, content: str, db: Session = Depends(get_db)):
   db.refresh(new_note) #refresh to get date and id
   return new_note
 
+@router.get("/notes")
+def get_all_notes(db: Session = Depends(get_db)):
+  all_notes = db.query(models.Note).all()
+  return all_notes
 
+@router.get("/notes/{id}") #use {} to make it dynamic and not a literal
+def get_note_by_id(id: int, db: Session = Depends(get_db)):
+  note = db.query(models.Note).filter(models.Note.id == id).first()
+  return note
