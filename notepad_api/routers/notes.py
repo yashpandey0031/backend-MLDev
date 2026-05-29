@@ -30,4 +30,11 @@ def get_all_notes(db: Session = Depends(get_db)):
 @router.get("/notes/{id}") #use {} to make it dynamic and not a literal
 def get_note_by_id(id: int, db: Session = Depends(get_db)):
   note = db.query(models.Note).filter(models.Note.id == id).first()
+  #first() only give the first item and unwrap it
   return note
+
+@router.delete("/notes/{id}")
+def delete_note_by_id(id: int,db: Session = Depends(get_db)):
+  note_to_be_deleted = db.delete(db.query(models.Note).filter(models.Note.id == id).first())
+  db.commit()
+  return note_to_be_deleted
