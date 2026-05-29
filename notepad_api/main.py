@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from database import engine
+from routers import notes
+
 import models
 
 

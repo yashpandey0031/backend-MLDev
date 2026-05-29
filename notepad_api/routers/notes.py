@@ -16,5 +16,10 @@ def get_db():
 
 @router.post("/notes")
 def create_note(title: str, content: str, db: Session = Depends(get_db)):
-  
+  new_note = models.Note(title = title, content=content)
+  db.add(new_note)
+  db.commit()
+  db.refresh(new_note) #refresh to get date and id
+  return new_note
+
 
