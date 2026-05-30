@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
@@ -34,7 +34,40 @@ def get_note_by_id(id: int, db: Session = Depends(get_db)):
   return note
 
 @router.delete("/notes/{id}")
-def delete_note_by_id(id: int,db: Session = Depends(get_db)):
-  note_to_be_deleted = db.delete(db.query(models.Note).filter(models.Note.id == id).first())
-  db.commit()
-  return note_to_be_deleted
+def delete_note_by_id(id: int, db: Session = Depends(get_db)):
+    note = db.query(models.Note).filter(models.Note.id == id).first()
+    
+    if note is None:
+        raise HTTPException(status_code=404, detail="Note not found")
+    
+    db.delete(note)
+    db.commit()
+    return {"message": "Note deleted successfully"}
+
+
+@router.put("/notes/{id}")
+def update_note_by_id(id: int,title: str,content: str, db: Session = Depends(get_db)):
+   note=db.query(models.Note).filter(models.Note.id == id).first()
+
+   if note is None:
+      raise HTTPException(status_code=404,detail="Note not found")
+   history_note_copy = models.History(note_id=note.id, title = note.title,content=note.content) #saving the old note by id 
+   db.add(history_note_copy)
+
+   note.title = title
+   note.content = content
+   db.commit()
+   db.refresh(note)
+   return note
+   
+@router.get("/notes/{id}/history")
+def fetch_note_history_by_id(id: int,db: Session = Depends(get_db)):
+   history = db.query(models.History).filter(models.History.note_id == id).all()
+
+   if not history :
+    raise HTTPException(status_code=404,detail="No history found for this")
+
+   return history
+
+#here we are fetching the history database for any entries with similar note_id and then just printing them
+#as for if not history , its coz since all there will always be a list even if empty 
