@@ -29,14 +29,14 @@ def get_all_notes(current_user: models.User = Depends(get_current_user), db: Ses
   return all_notes
 
 @router.get("/notes/{id}") #use {} to make it dynamic and not a literal
-def get_note_by_id(id: int, db: Session = Depends(get_db)):
-  note = db.query(models.Note).filter(models.Note.id == id).first()
+def get_note_by_id(id: int, db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user)):
+  note = db.query(models.Note).filter(models.Note.id == current_user.id).first()
   #first() only give the first item and unwrap it
   return note
 
 @router.delete("/notes/{id}")
-def delete_note_by_id(id: int, db: Session = Depends(get_db)):
-    note = db.query(models.Note).filter(models.Note.id == id).first()
+def delete_note_by_id(id: int, db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user)):
+    note = db.query(models.Note).filter(models.Note.id == current_user.id).first()
     
     if note is None:
         raise HTTPException(status_code=404, detail="Note not found")
@@ -47,8 +47,8 @@ def delete_note_by_id(id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/notes/{id}")
-def update_note_by_id(id: int,title: str,content: str, db: Session = Depends(get_db)):
-   note=db.query(models.Note).filter(models.Note.id == id).first()
+def update_note_by_id(id: int,title: str,content: str, db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user)):
+   note=db.query(models.Note).filter(models.Note.id == current_user.id).first()
 
    if note is None:
       raise HTTPException(status_code=404,detail="Note not found")
@@ -62,8 +62,8 @@ def update_note_by_id(id: int,title: str,content: str, db: Session = Depends(get
    return note
    
 @router.get("/notes/{id}/history")
-def fetch_note_history_by_id(id: int,db: Session = Depends(get_db)):
-   history = db.query(models.History).filter(models.History.note_id == id).all()
+def fetch_note_history_by_id(id: int,db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user)):
+   history = db.query(models.History).filter(models.History.note_id == current_user.id).all()
 
    if not history :
     raise HTTPException(status_code=404,detail="No history found for this")
