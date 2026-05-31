@@ -4,7 +4,7 @@
 # created_At
 # updated_at
 #orm is a programming technique to interact with the database insetead of writing sql everytime
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from database import Base
 from datetime import datetime
 
@@ -27,6 +27,14 @@ class History(Base):
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     saved_at = Column(DateTime, default=datetime.now)
+
+class User(Base):
+   __tablename__ = "user"
+
+   id = Column(Integer, primary_key =  True, index = True)
+   username = Column(String,nullable = False, unique = True)
+   hashed_password = Column(String,nullable = False) 
+   is_active = Column(Boolean, default =  True) #for setting the account as active or not 
 
   
 
