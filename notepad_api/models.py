@@ -11,6 +11,7 @@ from datetime import datetime
 class Note(Base):
   __tablename__ = "notes"
   id = Column(Integer, primary_key = True,index= True)
+  user_id = Column(Integer, ForeignKey("user.id"), nullable=False) #for fetching all the notes of a certain user_id , we will link this user_id with the id in user model 
   title = Column(String, nullable = False)
   content = Column(String, nullable = False)
   created_at = Column(DateTime, default = datetime.now)

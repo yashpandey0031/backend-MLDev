@@ -2,11 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from passlib.context import CryptContext
+from jose import jwt
 import models
+from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
-
+SECRET_KEY = "j8kL2mN9pQ4rS7tU1vW6xY3zA5bC0dE"
+ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+
+
 #opens a database sesion , gives it a endpoint and closes it when done , every endpoint has to use this 
 def get_db():
   db = SessionLocal()
@@ -31,3 +36,18 @@ def register_account(username: str, password: str, db: Session = Depends(get_db)
 
 
 
+@router.post("/login")
+def login_into_account(username: str, password: str, db: Session = Depends(get_db)):
+    finduser = db.query(models.User).filter(models.User.username == username).first()
+
+    if finduser is None:
+        raise HTTPException(status_code=404, detail="No user found with that username")
+    
+    if not pwd_context.verify(password, finduser.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect password")
+    
+    payload = {"user_id": finduser.id}
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return {"access_token": token}
+   
+#token that we get is basically a payload with all the info that we need to provide , in this case we need to vreify the user so we check the user id and its 1 in this case
