@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
+from routers.auth import get_current_user
 
 router = APIRouter()
 
@@ -15,16 +16,16 @@ def get_db():
     db.close()
 
 @router.post("/notes")
-def create_note(title: str, content: str, db: Session = Depends(get_db)):
-  new_note = models.Note(title = title, content=content)
+def create_note(title: str, content: str, db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user)):
+  new_note = models.Note(title = title, content=content, user_id=current_user.id)
   db.add(new_note)
   db.commit()
   db.refresh(new_note) #refresh to get date and id
   return new_note
 
 @router.get("/notes")
-def get_all_notes(db: Session = Depends(get_db)):
-  all_notes = db.query(models.Note).all()
+def get_all_notes(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+  all_notes = db.query(models.Note).filter(models.Note.user_id == current_user.id).all()
   return all_notes
 
 @router.get("/notes/{id}") #use {} to make it dynamic and not a literal
