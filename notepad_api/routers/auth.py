@@ -51,7 +51,7 @@ def register_account(username: str, password: str, db: Session = Depends(get_db)
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 @router.post("/login")
-def login_into_account(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_into_account(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)): #for working with fastapi forms
     finduser = db.query(models.User).filter(models.User.username == form_data.username).first()
 
     if finduser is None:
@@ -63,6 +63,7 @@ def login_into_account(form_data: OAuth2PasswordRequestForm = Depends(), db: Ses
     payload = {"user_id": finduser.id}
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer"}
+    #payload is user_id as that will allow us to only provide content to people with that user id , this will be moving through token which also has the secret_key and algorhtm 
    
 #token that we get is basically a payload with all the info that we need to provide , in this case we need to vreify the user so we check the user id and its 1 in this case
 
