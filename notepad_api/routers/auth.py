@@ -7,10 +7,12 @@ import models
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import os
 
-
+load_dotenv()
 router = APIRouter()
-SECRET_KEY = "j8kL2mN9pQ4rS7tU1vW6xY3zA5bC0dE"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
