@@ -6,6 +6,7 @@ from jose import jwt
 import models
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from datetime import datetime, timedelta
 
 
 router = APIRouter()
@@ -60,7 +61,9 @@ def login_into_account(form_data: OAuth2PasswordRequestForm = Depends(), db: Ses
     if not pwd_context.verify(form_data.password, finduser.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect password")
     
-    payload = {"user_id": finduser.id}
+    payload = {"user_id": finduser.id,
+               "exp" : datetime.now()+timedelta(hours=24)
+               }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer"}
     #payload is user_id as that will allow us to only provide content to people with that user id , this will be moving through token which also has the secret_key and algorhtm 
