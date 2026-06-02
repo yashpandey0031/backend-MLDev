@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
 from routers.auth import get_current_user
+from datetime import datetime
 
 router = APIRouter()
 
@@ -15,12 +16,19 @@ def get_db():
   finally:
     db.close()
 
+def activity_log(titleo: str, created_ato: datetime):
+    with open("activity.log", "a", encoding="utf-8") as file:
+        file.write(f"[{created_ato}] Note created: {titleo}\n")
+
+   
+
 @router.post("/notes")
-def create_note(title: str, content: str, db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user)):
+def create_note(title: str, content: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db),current_user: models.User = Depends(get_current_user),):
   new_note = models.Note(title = title, content=content, user_id=current_user.id)
-  db.add(new_note)
+  db.add(new_note) 
   db.commit()
   db.refresh(new_note) #refresh to get date and id
+  background_tasks.add_task(activity_log,new_note.title,new_note.created_at)
   return new_note
 
 @router.get("/notes")
