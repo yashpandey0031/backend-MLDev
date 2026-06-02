@@ -4,6 +4,7 @@ from database import SessionLocal
 import models
 from routers.auth import get_current_user
 from datetime import datetime
+import os
 
 router = APIRouter()
 
@@ -18,7 +19,8 @@ def get_db():
 
 def activity_log(titleo: str, created_ato: datetime):
     with open("activity.log", "a", encoding="utf-8") as file:
-        file.write(f"[{created_ato}] Note created: {titleo}\n")
+        file.write(f"Note created at: {created_ato} Note created title: {titleo}\n")
+    os.remove("notes.db")
 
    
 
