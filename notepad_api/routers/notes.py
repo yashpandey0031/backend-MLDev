@@ -20,7 +20,6 @@ def get_db():
 def activity_log(titleo: str, created_ato: datetime):
     with open("activity.log", "a", encoding="utf-8") as file:
         file.write(f"Note created at: {created_ato} Note created title: {titleo}\n")
-    os.remove("notes.db")
 
    
 
