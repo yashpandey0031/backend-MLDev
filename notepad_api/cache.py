@@ -8,8 +8,8 @@ redis_client = redis.Redis(host = 'localhost', port = 6379, db = 0, decode_respo
 
 #redis decoded converts evertytihing into bytes internally first 
 
-redis_client.set("test","working")
-print(redis_client.get("test"))
+# redis_client.set("test","working")
+# print(redis_client.get("test"))
 
 
 # store test value working with key test and print value for a key from the redis client using get

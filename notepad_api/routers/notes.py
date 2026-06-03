@@ -4,6 +4,8 @@ from database import SessionLocal
 import models
 from routers.auth import get_current_user
 from datetime import datetime
+import json
+from cache import redis_client
 import os
 
 router = APIRouter()
@@ -34,7 +36,18 @@ def create_note(title: str, content: str, background_tasks: BackgroundTasks, db:
 
 @router.get("/notes")
 def get_all_notes(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+
+  cache_key = f"notes_user_{current_user.id}"
+
+  cached = redis_client.get(cache_key)
+  if cached:
+    return json.loads(cached)
+
   all_notes = db.query(models.Note).filter(models.Note.user_id == current_user.id).all()
+
+  redis_client.set(cache_key,json.dumps([{k: str(v) for k, v in note.__dict__.items() if k != '_sa_instance_state'} for note in all_notes]), ex=60) #ex=60 so that the requests are updated after every 60 and the user can access them and datadoesnt go stale
+  print("cached:", redis_client.get(cache_key))
+
   return all_notes
 
 @router.get("/notes/{id}") #use {} to make it dynamic and not a literal
