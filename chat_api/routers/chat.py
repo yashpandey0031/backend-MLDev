@@ -1,8 +1,10 @@
-from fastapi import APIRouter, WebSocket , Depends, HTTPException
+from fastapi import APIRouter, WebSocket , Depends, HTTPException, UploadFile,File
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
 import asyncio
+import shutil
+import os
 
 router = APIRouter()
 
@@ -53,3 +55,12 @@ async def chat_endpoint(websocket: WebSocket, username: str, db: Session = Depen
 def get_all_messages_by_users(db: Session = Depends(get_db)):
    all_Data= db.query(models.Message).all()
    return all_Data
+
+
+@router.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    folder_name = "uploads"
+    file_path=f"{folder_name}/{file.filename}"
+    with open(file_path,"wb") as buffer:
+       shutil.copyfileobj(file.file,buffer)
+    return {"filename": file.filename, "url" : f"/uploads/{file.filename}"}
