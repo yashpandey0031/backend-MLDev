@@ -7,7 +7,7 @@ def test_Get_messages():
   response = client.get("/messages")
   assert response.status_code == 200
   assert isinstance(response.json(), list)
-
+# checking if the instance is a list or not otherwise fail the test 
 
 def test_upload_wrong_file_type():
   response = client.post(
@@ -16,3 +16,26 @@ def test_upload_wrong_file_type():
   )
 
   assert response.status_code == 400
+
+def test_pdf_file_upload():
+  response = client.post("/uploadfile",files = {"file" : ("document.pdf",b"fakecontent","application/pdf")}
+  )
+
+  assert response.status_code == 200
+
+def test_websocket_chat():
+  with client.websocket_connect("chat/testuser") as websocket:
+    websocket.send_text("hello")
+    data=websocket.receive_text()
+    assert data == "testuser: hello" #makes the changes directly to the database and checks if a message with that user is present or not 
+
+
+def test_full_connection():
+  with client.websocket_connect("chat/testuser2") as ws2:
+    with client.websocket_connect("chat/testuser3") as ws3:
+      ws2.send_text("hello from user1")
+
+      data_ws2 = ws2.receive_text()
+      data_ws3 = ws3.receive_text()
+      assert data_ws2 == "testuser2: hello from user1"
+      assert data_ws3 == "testuser2: hello from user1"
