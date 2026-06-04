@@ -1,5 +1,7 @@
 from fastapi.testclient import TestClient
 from main import app
+from unittest.mock import AsyncMock
+from routers.chat import manager
 
 client = TestClient(app)
 
@@ -39,3 +41,20 @@ def test_full_connection():
       data_ws3 = ws3.receive_text()
       assert data_ws2 == "testuser2: hello from user1"
       assert data_ws3 == "testuser2: hello from user1"
+#created two instances to see they are both seeing the messages or not
+
+def test_connection_manager():
+    fake_websocket = AsyncMock() #creates a fake object that acts like real users
+    
+    import asyncio
+    asyncio.run(manager.connect(fake_websocket))
+    #connect the fake websocket into the functions 
+    
+    assert fake_websocket in manager.active_connections
+    #if they are in the connection it is active connection 
+    manager.disconnect(fake_websocket)
+    #disconnect
+    
+    assert fake_websocket not in manager.active_connections
+
+    #after diconnection , no connection should remain in active_connections we are assrting that here
