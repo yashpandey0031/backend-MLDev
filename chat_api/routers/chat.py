@@ -63,6 +63,10 @@ async def create_upload_file(file: UploadFile):
     allowed_types=["application/pdf"]
     if file.content_type not in allowed_types:
        raise HTTPException(status_code=400, detail="only pdfs are allowed")
+    
+    #  extension = os.path.splitext(file.filename)[1]  # gets .jpg, .png etc
+    # unique_filename = f"{uuid.uuid4()}{extension}"  # e.g. a1b2c3d4.jpg
+    
     folder_name = "uploads"
     file_path=f"{folder_name}/{file.filename}"
     with open(file_path,"wb") as buffer:
