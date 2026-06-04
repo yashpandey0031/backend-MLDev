@@ -59,6 +59,10 @@ def get_all_messages_by_users(db: Session = Depends(get_db)):
 
 @router.post("/uploadfile/")
 async def create_upload_file(file: UploadFile):
+    #file type check coz why not fuck yeah
+    allowed_types=["application/pdf"]
+    if file.content_type not in allowed_types:
+       raise HTTPException(status_code=400, detail="only pdfs are allowed")
     folder_name = "uploads"
     file_path=f"{folder_name}/{file.filename}"
     with open(file_path,"wb") as buffer:
