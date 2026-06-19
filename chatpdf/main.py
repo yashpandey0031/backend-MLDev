@@ -16,6 +16,9 @@ chunks =  splitter.split_documents(pages)
 
 embeddings = HuggingFaceEmbeddings(model_name = "sentence-tranformers/all-MiniLM-L6-v2")
 
+vectorstore = FAISS.from_documents(chunks, embeddings)
+
+
 results = vectorstore.similarity_search("How does the notification system work?", k=3)
 
 for r in results:
