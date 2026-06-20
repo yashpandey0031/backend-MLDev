@@ -12,20 +12,21 @@ llm = ChatGroq(model="llama-3.1-8b-instant")
 
 
 class AgentState(TypedDict):
-    messages: list
+    messages: list # it is just being used for defining the data type which is list here 
+                                  
 
-
-@tool
+@tool #a python function which will be acting as the tool
 def add(a: int,b:int) -> int:
     """adds two numbers together.""" #the llm reads this and then understands ok i have to use this and is sent to the model 
     return a + b
 
+#same here a tool which is nothing but a python function as it makes it discoverable by the langchain tool calling system and its discovering
 @tool
 def multiply(a: int , b:int) -> int:
     """multiples two numbers together """
     return a*b
 
-
+# a lookup disctionary for the LLM
 tools_by_name = {"add": add,"multiply":multiply}
 
 llm_with_tools = llm.bind_tools([add, multiply])#telling the llm that these tools exist 
@@ -38,7 +39,7 @@ def call_tool(state: AgentState):
       result = tool_fn.invoke(tool_call["args"])
       tool_messages.append(ToolMessage(content=str(result), tool_call_id=tool_call["id"]))
 
-    return {"messages": state["messages"] + [tool_messages]}
+    return {"messages": state["messages"] + tool_messages}
 
 def should_continue(state: AgentState):
     last_message = state["messages"][-1]
