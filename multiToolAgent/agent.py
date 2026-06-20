@@ -31,9 +31,11 @@ tools_by_name = {"add": add,"multiply":multiply}
 
 llm_with_tools = llm.bind_tools([add, multiply])#telling the llm that these tools exist 
 
+
+#for every tool requested , it looks up the functions and then parses the values and wrapps it into tool_messages along with the id 
 def call_tool(state: AgentState):
     last_message = state["messages"][-1]
-    tool_messages = []
+    tool_messages = [] #used for wrapping the llm response
     for tool_call in last_message.tool_calls:
       tool_fn = tools_by_name[tool_call["name"]]
       result = tool_fn.invoke(tool_call["args"])
@@ -41,17 +43,24 @@ def call_tool(state: AgentState):
 
     return {"messages": state["messages"] + tool_messages}
 
+
+#a decision for checking whether the llm asked for a tool or actually gave a real answer 
 def should_continue(state: AgentState):
     last_message = state["messages"][-1]
     if last_message.tool_calls:
         return "call_tool"
     return END
 
+
+#takes current convo , send it to llm , get one new message bcak a normal answer of a request to use tools , append it to the conversation return the updated state 
+
 def call_llm(state: AgentState): #updating the callllm function to use all the tools allowed 
     response = llm_with_tools.invoke(state["messages"])
     return {"messages": state["messages"] + [response]}
 
 
+
+#registers two nodes , runs call llm first and checks with should continue to decide to go or to stop then call tool run , after getting a solution it will go back to call llm to get the anwer back or a new input that the llm wants to parse through the llm 
 graph = StateGraph(AgentState)
 graph.add_node("call_llm", call_llm)
 graph.add_node("call_tool", call_tool)
@@ -63,6 +72,9 @@ graph.add_edge("call_tool", "call_llm")
 
 app = graph.compile()
 
+
+
+#actualy execution for the messages d/b human and ai messages
 result = app.invoke({"messages": [HumanMessage(content="What is 25 + 35?, and what is 7 times 8?")]})
 print(result)
 
