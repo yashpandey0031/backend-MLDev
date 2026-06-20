@@ -68,10 +68,13 @@ graph.add_node("call_tool", call_tool)
 graph.set_entry_point("call_llm")
 
 graph.add_conditional_edges("call_llm", should_continue)
-graph.add_edge("call_tool", "call_llm")
+graph.add_edge("call_tool", "call_llm") #edge for call tool as they are connected
 
 app = graph.compile()
 
+graph_png = app.get_graph().draw_mermaid_png()
+with open("graph.png", "wb") as f:
+    f.write(graph_png)
 
 
 #actualy execution for the messages d/b human and ai messages
