@@ -1,4 +1,4 @@
-from main import vectorstore
+from main import build_vectorstore
 from groq import Groq
 import os
 from dotenv import load_dotenv
@@ -7,7 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-query = "How does the notification system work?"
+query = input("Ask a question about the pdf: ")
+
+vectorstore = build_vectorstore("pdf/SystemDesignInterview.pdf")
+
 results = vectorstore.similarity_search(query, k=3)
 
 context = "\n\n".join([r.page_content for r in results])
