@@ -20,20 +20,25 @@ def add(a: int,b:int) -> int:
     """adds two numbers together.""" #the llm reads this and then understands ok i have to use this and is sent to the model 
     return a + b
 
-tools_by_name = {"add": add}
+@tool
+def multiply(a: int , b:int) -> int:
+    """multiples two numbers together """
+    return a*b
 
-llm_with_tools = llm.bind_tools([add]) #telling the llm that these tools exist 
+
+tools_by_name = {"add": add,"multiply":multiply}
+
+llm_with_tools = llm.bind_tools([add, multiply])#telling the llm that these tools exist 
 
 def call_tool(state: AgentState):
     last_message = state["messages"][-1]
-    tool_call = last_message.tool_calls[0]  # just handling one for now
+    tool_messages = []
+    for tool_call in last_message.tool_calls:
+      tool_fn = tools_by_name[tool_call["name"]]
+      result = tool_fn.invoke(tool_call["args"])
+      tool_messages.append(ToolMessage(content=str(result), tool_call_id=tool_call["id"]))
 
-    tool_fn = tools_by_name[tool_call["name"]]
-    result = tool_fn.invoke(tool_call["args"])
-
-    tool_message = ToolMessage(content=str(result), tool_call_id=tool_call["id"])
-
-    return {"messages": state["messages"] + [tool_message]}
+    return {"messages": state["messages"] + [tool_messages]}
 
 def should_continue(state: AgentState):
     last_message = state["messages"][-1]
@@ -57,7 +62,7 @@ graph.add_edge("call_tool", "call_llm")
 
 app = graph.compile()
 
-result = app.invoke({"messages": [HumanMessage(content="What is 25 + 35?")]})
+result = app.invoke({"messages": [HumanMessage(content="What is 25 + 35?, and what is 7 times 8?")]})
 print(result)
 
 #the llm never runs code , it takes values and gives them to the function and takes the input from that then process it 
