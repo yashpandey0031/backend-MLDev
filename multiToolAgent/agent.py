@@ -7,12 +7,14 @@ from langchain_core.tools import tool
 from langchain_core.messages import ToolMessage
 from langchain_tavily import TavilySearch
 
-search_tool = TavilySearch(max_results = 3)
+
 
 
 load_dotenv()
 
 llm = ChatGroq(model="llama-3.1-8b-instant")
+
+search_tool = TavilySearch(max_results = 3)
 
 
 class AgentState(TypedDict):
@@ -87,7 +89,7 @@ with open("graph.png", "wb") as f:
 
 #actualy execution for the messages d/b human and ai messages
 result = app.invoke({"messages": [HumanMessage(content="What is 25 + 35?, and who is the prime minister of india ?")]})
-print(result)
+print(result) 
 
 #the llm never runs code , it takes values and gives them to the function and takes the input from that then process it 
 
