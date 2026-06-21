@@ -5,6 +5,10 @@ from langchain_core.messages import HumanMessage
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_core.messages import ToolMessage
+from langchain_tavily import TavilySearch
+
+search_tool = TavilySearch(max_results = 3)
+
 
 load_dotenv()
 
@@ -27,12 +31,16 @@ def multiply(a: int , b:int) -> int:
     return a*b
 
 # a lookup disctionary for the LLM
-tools_by_name = {"add": add,"multiply":multiply}
+# list of all tools the agent can use
+tools = [add, multiply, search_tool]
 
-llm_with_tools = llm.bind_tools([add, multiply])#telling the llm that these tools exist 
+tools_by_name = {t.name: t for t in tools}
+
+llm_with_tools = llm.bind_tools(tools)#telling the llm that these tools exist 
 
 
 #for every tool requested , it looks up the functions and then parses the values and wrapps it into tool_messages along with the id 
+
 def call_tool(state: AgentState):
     last_message = state["messages"][-1]
     tool_messages = [] #used for wrapping the llm response
@@ -71,14 +79,14 @@ graph.add_conditional_edges("call_llm", should_continue)
 graph.add_edge("call_tool", "call_llm") #edge for call tool as they are connected
 
 app = graph.compile()
-
+# for drawing the graph
 graph_png = app.get_graph().draw_mermaid_png()
 with open("graph.png", "wb") as f:
     f.write(graph_png)
 
 
 #actualy execution for the messages d/b human and ai messages
-result = app.invoke({"messages": [HumanMessage(content="What is 25 + 35?, and what is 7 times 8?")]})
+result = app.invoke({"messages": [HumanMessage(content="What is 25 + 35?, and who is the prime minister of india ?")]})
 print(result)
 
 #the llm never runs code , it takes values and gives them to the function and takes the input from that then process it 
